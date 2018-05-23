@@ -33,6 +33,11 @@ const Routers = function({ history, app }) {
       models: () => [import('./models/service')],
       component: () => import('./routes/OpenServices'),
     },
+    {
+      path: '/intelligentexcel',
+      models: () => [import('./models/intelligentExcel')],
+      component: () => import('./routes/Intelligent'),
+    },
   ];
 
   return (
