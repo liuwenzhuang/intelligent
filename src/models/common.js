@@ -27,23 +27,23 @@ const pageModel = modelExtend(model, {
 
   effects: {
     *effectPostWithSucessModal({ payload }, { call, put }) {
-      const { success, information } = yield call(commonPost, payload);
-      if (!success) throw information;
+      const { success, message } = yield call(commonPost, payload);
+      if (!success) throw message;
       Modal.info({
         title: '提示',
-        content: information,
+        content: message,
       });
-      return information;
+      return message;
     },
 
     *effectGetWithModal({ payload }, { call, put }) {
-      const { success, information } = yield call(commonGet, payload);
-      if (!success) throw information;
+      const { success, message } = yield call(commonGet, payload);
+      if (!success) throw message;
       Modal.info({
         title: '提示',
-        content: information,
+        content: message,
       });
-      return information;
+      return message;
     },
 
     *showSuccessModal({ payload }) {

@@ -45,7 +45,7 @@ const Routers = function({ history, app }) {
     },
     {
       path: '/managedetail',
-      models: () => [import('./models/manage')],
+      models: () => [import('./models/manageDetail')],
       component: () => import('./routes/Manage/ManageDetail'),
     },
   ];

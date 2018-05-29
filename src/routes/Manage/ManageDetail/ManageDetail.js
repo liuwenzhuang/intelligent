@@ -1,69 +1,158 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
-import { Table, Divider, Row, Col, Tabs } from 'antd';
-import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import { Api, serverUrl } from '../../../config';
-import { stringify } from 'qs';
-
-const TabPane = Tabs.TabPane;
+import { Table, Divider, Row, Col, Card } from 'antd';
+import { Api } from '../../../config';
+import CONSTANTS from '../Constants';
 
 class ManageDetail extends Component {
+  version = '';
+  flag = '';
+  record = null;
+
+  componentDidMount() {
+    const { location } = this.props;
+    this.flag = location.state ? location.state.flag : null;
+    this.record = location.state ? location.state.record : null;
+    this.version = this.record ? this.record['version'] : null;
+    this.queryList();
+  }
+
+  queryList = () => {
+    const { dispatch } = this.props;
+    const { version, flag } = this;
+    dispatch({
+      type: 'manageDetail/queryReimburseWithStatus',
+      payload: {
+        version,
+        flag,
+        current: '1',
+        pageSize: '20',
+        url: Api.MANAGE.QUERY_REIMBURSE_WITH_STATUS,
+      },
+    });
+  };
+
+  handleDeleteOrRecovery = ({ phone }, url) => {
+    const { dispatch } = this.props;
+    const { version } = this;
+    dispatch({
+      type: 'manageDetail/effectPostWithSucessModal',
+      payload: {
+        url,
+        phone,
+        version,
+      },
+    }).then(this.queryList);
+  };
+
+  handleSendMessage = ({ phone } = {}) => {
+    const { dispatch } = this.props;
+    const { version } = this;
+    dispatch({
+      type: 'manageDetail/effectPostWithSucessModal',
+      payload: {
+        version,
+        phone,
+        url: phone ? Api.MANAGE.SEND_MESSAGE_WITH_CONDITION : Api.MANAGE.SEND_MESSAGE,
+      },
+    });
+  };
+
   generateColumns = () => {
     return [
       {
         title: '用户',
-        dataIndex: 'reimburseName',
-        key: 'reimburseName',
+        dataIndex: 'userName',
+        key: 'userName',
         align: 'center',
       },
       {
         title: '手机号',
-        dataIndex: 'successCount',
-        key: 'successCount',
+        dataIndex: 'phone',
+        key: 'phone',
         align: 'center',
       },
       {
         title: '部门',
-        dataIndex: 'failureCount',
-        key: 'failureCount',
+        dataIndex: 'dept',
+        key: 'dept',
         align: 'center',
       },
       {
         title: '单据金额',
-        dataIndex: 'time',
-        key: 'time',
+        dataIndex: 'billMoney',
+        key: 'billMoney',
         align: 'center',
       },
       {
         title: '单据状态',
-        dataIndex: 'manage',
-        key: 'manage',
+        dataIndex: 'status',
+        key: 'status',
         align: 'center',
         render: (text, record) => {
-          return (
-            // eslint-disable-next-line
-            <a href="javascript:void(0)" onClick={this.openDetail}>
-              查看
-            </a>
-          );
+          const { status } = record;
+          return <span>{CONSTANTS.STATUSMAPPING[status]}</span>;
         },
       },
       {
         title: '操作',
-        dataIndex: 'download',
-        key: 'download',
+        dataIndex: 'operation',
+        key: 'operation',
         align: 'center',
         render: (text, record) => {
+          const { status } = record;
+          let childs = [];
           /* eslint-disable */
-          return (
-            <span>
-              <a href={`${serverUrl}/exportExcel?id=${record.id}`}>删除</a>
-              <Divider type="vertical" />
-              <a href="javascript:void(0)">查看详情</a>
-              <Divider type="vertical" />
-              <a href="javascript:void(0)">查看通知</a>
-            </span>
+          const divider = <Divider type="vertical" />;
+          const viewDetailsAction = <a href="javascript:void(0)">查看详情</a>;
+          const deleteAction = (
+            <a
+              href="javascript:void(0)"
+              onClick={this.handleDeleteOrRecovery.bind(this, record, Api.MANAGE.DELETE_REIMBURSE)}
+            >
+              删除
+            </a>
           );
+          const resumeDeleteAction = (
+            <a
+              href="javascript:void(0)"
+              onClick={this.handleDeleteOrRecovery.bind(
+                this,
+                record,
+                Api.MANAGE.RECOVERY_REIMBURSE
+              )}
+            >
+              恢复删除
+            </a>
+          );
+          const dispatchNotificationAction = (
+            <a href="javascript:void(0)" onClick={this.handleSendMessage.bind(this, record)}>
+              发送通知
+            </a>
+          );
+          switch (`${status}`) {
+            case CONSTANTS.SUBMITTED: // 已提交
+            case CONSTANTS.IMPORT_FAILURE: // 导入失败
+              childs = [viewDetailsAction];
+              break;
+            case CONSTANTS.UNSUBMIT:
+              childs = [
+                deleteAction,
+                divider,
+                viewDetailsAction,
+                divider,
+                dispatchNotificationAction,
+              ];
+              break;
+            case CONSTANTS.DELETED:
+              childs = [resumeDeleteAction, divider, viewDetailsAction];
+              break;
+            default:
+              childs = [viewDetailsAction];
+              break;
+          }
+
+          return <span>{React.Children.map(childs, child => child)}</span>;
         },
         /* eslint-enable */
       },
@@ -71,10 +160,10 @@ class ManageDetail extends Component {
   };
 
   generateHeaderContent = () => {
-    const { location } = this.props;
-    const record = location.state ? location.state.record : null;
+    const { record, flag } = this;
     let headerContent = null;
-    if (record) {
+    if (record && flag) {
+      /* eslint-disable */
       const { reimburseName, time, successCount, failureCount, changeFileName, fileName } = record;
       headerContent = (
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} align="middle" type="flex">
@@ -84,26 +173,31 @@ class ManageDetail extends Component {
           <Col md={8} xs={24}>
             {`导入时间:${time}`}
           </Col>
-          <Col md={8} xs={24}>
-            {`导入成功:${successCount}  导入失败:${failureCount}`}
-          </Col>
-          <Col md={4} xs={24}>
-            <span>
-              <a
-                href={`${serverUrl}${Api.ALIYUN.DOWNLOAD_FILE_FROM_ALIYUN}?${stringify({
-                  changeFileName,
-                  fileName,
-                })}`}
-                target="_blank"
-              >
-                数据下载
-              </a>
-              <Divider type="vertical" />
-              <a>全部发送通知</a>
-            </span>
-          </Col>
+          {flag === CONSTANTS.SUCCESS ? (
+            <Fragment>
+              <Col md={8} xs={24}>
+                导入成功：{successCount}
+              </Col>
+              <Col md={4} xs={24}>
+                <a href="javascript:void(0)" onClick={this.handleSendMessage}>
+                  全部发送通知
+                </a>
+              </Col>
+            </Fragment>
+          ) : null}
+          {flag === CONSTANTS.FAILURE ? (
+            <Fragment>
+              <Col md={8} xs={24}>
+                导入失败：{failureCount}
+              </Col>
+              <Col md={4} xs={24}>
+                <a>下载导入失败数据</a>
+              </Col>
+            </Fragment>
+          ) : null}
         </Row>
       );
+      /* eslint-enable */
     }
     return headerContent;
   };
@@ -112,24 +206,24 @@ class ManageDetail extends Component {
     const columns = this.generateColumns();
     const headerContent = this.generateHeaderContent();
     const {
-      manage: { list, pagination },
+      manageDetail: { list, pagination },
     } = this.props;
     return (
-      <PageHeaderLayout title="自动报销单管理单据" extraContent={headerContent}>
-        <Tabs>
-          <TabPane tab="导入成功单据" key="success">
-            <Table columns={columns} dataSource={list} pagination={pagination} />
-          </TabPane>
-          <TabPane tab="导入失败单据" key="failure">
-            <Table columns={columns} dataSource={list} pagination={pagination} />
-          </TabPane>
-        </Tabs>
-      </PageHeaderLayout>
+      <Fragment>
+        <Card title="自动报销单管理单据">{headerContent}</Card>
+        <Table
+          style={{ marginTop: 16 }}
+          rowKey={record => record.id}
+          columns={columns}
+          dataSource={list}
+          pagination={pagination}
+        />
+      </Fragment>
     );
   }
 }
 
-export default connect(({ manage, loading }) => ({
-  manage,
+export default connect(({ manageDetail, loading }) => ({
+  manageDetail,
   loading,
 }))(ManageDetail);
