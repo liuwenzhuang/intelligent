@@ -2,7 +2,7 @@ const serverSuffix = 'data-stats-system';
 const serverUrl =
   process.env.NODE_ENV === 'production'
     ? `${window.location.protocol}//${process.env.SERVER_ENV}`
-    : 'http://localhost:8090';
+    : 'http://10.11.65.37:9090';
 const appName = '商旅服务--友报账';
 const appAuthor = 'liuwzhb';
 const authorEmail = 'liuwzhb@yonyou.com';
@@ -14,6 +14,12 @@ const smeCtripPrefix = '/smeCtrip';
 const Api = {
   INTELLIGENTEXCEL: {
     QUERY_REIMBURSE_TYPE: `/reimburse/queryReimburseType`,
+  },
+  MANAGE: {
+    QUERY_REIMBURSE_LIST: `/reimburse/queryReimburseList`,
+  },
+  ALIYUN: {
+    DOWNLOAD_FILE_FROM_ALIYUN: `/downloadFileFromALiyun`,
   },
   CTRIP: {
     ORG_INFO: `${ctripApiPrefix}/orginfo`,

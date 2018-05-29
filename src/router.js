@@ -38,6 +38,16 @@ const Routers = function({ history, app }) {
       models: () => [import('./models/intelligentExcel')],
       component: () => import('./routes/Intelligent'),
     },
+    {
+      path: '/manage',
+      models: () => [import('./models/manage')],
+      component: () => import('./routes/Manage'),
+    },
+    {
+      path: '/managedetail',
+      models: () => [import('./models/manage')],
+      component: () => import('./routes/Manage/ManageDetail'),
+    },
   ];
 
   return (
@@ -45,7 +55,7 @@ const Routers = function({ history, app }) {
       <LocaleProvider locale={zhCN}>
         <div className="container">
           <Switch>
-            <Route exact path="/" render={() => <Redirect to="/ctripsecondauthorized" />} />
+            <Route exact path="/" render={() => <Redirect to="/manage" />} />
             {routes.map(({ path, ...dynamics }, key) => (
               <Route
                 key={key}
