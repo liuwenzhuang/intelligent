@@ -2,7 +2,7 @@ const serverSuffix = 'data-stats-system';
 const serverUrl =
   process.env.NODE_ENV === 'production'
     ? `${window.location.protocol}//${process.env.SERVER_ENV}`
-    : 'http://10.11.65.37:9090';
+    : 'http://10.11.65.37:8090';
     // : '';
 const appName = '商旅服务--友报账';
 const appAuthor = 'liuwzhb';

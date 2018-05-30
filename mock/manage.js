@@ -9,7 +9,7 @@ for (let i = 0; i < 200; i++) {
     reimburseName: Random.cname(),
     successCount: Random.integer(10, 2000),
     failureCount: Random.integer(0, 10),
-    time: Random.date('yyyy-MM-dd'),
+    createTime: Random.date('yyyy-MM-dd'),
     version: Random.guid(),
   });
 }

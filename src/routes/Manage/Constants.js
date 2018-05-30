@@ -1,5 +1,5 @@
 const SUCCESS = '0';
-const FAILURE = ' 1';
+const FAILURE = '1';
 
 const IMPORT_FAILURE = '-1';
 const DELETED = '0';

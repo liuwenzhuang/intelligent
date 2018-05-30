@@ -1,40 +1,29 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'dva';
+import queryString from 'query-string';
+import PropTypes from 'prop-types';
 import { Table, Divider, Row, Col, Card } from 'antd';
 import { Api } from '../../../config';
 import CONSTANTS from '../Constants';
 
-class ManageDetail extends Component {
-  version = '';
-  flag = '';
-  record = null;
+const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
+  const query = queryString.parse(location.search);
+  const { flag, version } = query;
 
-  componentDidMount() {
-    const { location } = this.props;
-    this.flag = location.state ? location.state.flag : null;
-    this.record = location.state ? location.state.record : null;
-    this.version = this.record ? this.record['version'] : null;
-    this.queryList();
-  }
-
-  queryList = () => {
-    const { dispatch } = this.props;
-    const { version, flag } = this;
+  const queryList = ({ current = 1, pageSize = 20 } = {}) => {
     dispatch({
       type: 'manageDetail/queryReimburseWithStatus',
       payload: {
         version,
         flag,
-        current: '1',
-        pageSize: '20',
+        current,
+        pageSize,
         url: Api.MANAGE.QUERY_REIMBURSE_WITH_STATUS,
       },
     });
   };
 
-  handleDeleteOrRecovery = ({ phone }, url) => {
-    const { dispatch } = this.props;
-    const { version } = this;
+  const handleDeleteOrRecovery = ({ phone }, url) => {
     dispatch({
       type: 'manageDetail/effectPostWithSucessModal',
       payload: {
@@ -42,12 +31,10 @@ class ManageDetail extends Component {
         phone,
         version,
       },
-    }).then(this.queryList);
+    }).then(queryList);
   };
 
-  handleSendMessage = ({ phone } = {}) => {
-    const { dispatch } = this.props;
-    const { version } = this;
+  const handleSendMessage = ({ phone } = {}) => {
     dispatch({
       type: 'manageDetail/effectPostWithSucessModal',
       payload: {
@@ -58,7 +45,11 @@ class ManageDetail extends Component {
     });
   };
 
-  generateColumns = () => {
+  const handleTableChange = pagination => {
+    queryList(pagination);
+  };
+
+  const generateColumns = () => {
     return [
       {
         title: '用户',
@@ -100,15 +91,15 @@ class ManageDetail extends Component {
         key: 'operation',
         align: 'center',
         render: (text, record) => {
-          const { status } = record;
+          const { status, billDetailUrl } = record;
           let childs = [];
           /* eslint-disable */
           const divider = <Divider type="vertical" />;
-          const viewDetailsAction = <a href="javascript:void(0)">查看详情</a>;
+          const viewDetailsAction = <a href={billDetailUrl}>查看详情</a>;
           const deleteAction = (
             <a
               href="javascript:void(0)"
-              onClick={this.handleDeleteOrRecovery.bind(this, record, Api.MANAGE.DELETE_REIMBURSE)}
+              onClick={() => handleDeleteOrRecovery(record, Api.MANAGE.DELETE_REIMBURSE)}
             >
               删除
             </a>
@@ -116,17 +107,13 @@ class ManageDetail extends Component {
           const resumeDeleteAction = (
             <a
               href="javascript:void(0)"
-              onClick={this.handleDeleteOrRecovery.bind(
-                this,
-                record,
-                Api.MANAGE.RECOVERY_REIMBURSE
-              )}
+              onClick={() => handleDeleteOrRecovery(record, Api.MANAGE.RECOVERY_REIMBURSE)}
             >
               恢复删除
             </a>
           );
           const dispatchNotificationAction = (
-            <a href="javascript:void(0)" onClick={this.handleSendMessage.bind(this, record)}>
+            <a href="javascript:void(0)" onClick={() => handleSendMessage(record)}>
               发送通知
             </a>
           );
@@ -159,19 +146,25 @@ class ManageDetail extends Component {
     ];
   };
 
-  generateHeaderContent = () => {
-    const { record, flag } = this;
+  const generateHeaderContent = () => {
     let headerContent = null;
-    if (record && flag) {
+    if (query) {
       /* eslint-disable */
-      const { reimburseName, time, successCount, failureCount, changeFileName, fileName } = record;
+      const {
+        reimburseName,
+        createTime = '',
+        successCount,
+        failureCount,
+        changeFileName,
+        fileName,
+      } = query;
       headerContent = (
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} align="middle" type="flex">
           <Col md={4} xs={24}>
             {reimburseName}
           </Col>
           <Col md={8} xs={24}>
-            {`导入时间:${time}`}
+            {`导入时间:${createTime}`}
           </Col>
           {flag === CONSTANTS.SUCCESS ? (
             <Fragment>
@@ -179,7 +172,7 @@ class ManageDetail extends Component {
                 导入成功：{successCount}
               </Col>
               <Col md={4} xs={24}>
-                <a href="javascript:void(0)" onClick={this.handleSendMessage}>
+                <a href="javascript:void(0)" onClick={() => handleSendMessage()}>
                   全部发送通知
                 </a>
               </Col>
@@ -202,26 +195,28 @@ class ManageDetail extends Component {
     return headerContent;
   };
 
-  render() {
-    const columns = this.generateColumns();
-    const headerContent = this.generateHeaderContent();
-    const {
-      manageDetail: { list, pagination },
-    } = this.props;
-    return (
-      <Fragment>
-        <Card title="自动报销单管理单据">{headerContent}</Card>
-        <Table
-          style={{ marginTop: 16 }}
-          rowKey={record => record.id}
-          columns={columns}
-          dataSource={list}
-          pagination={pagination}
-        />
-      </Fragment>
-    );
-  }
-}
+  const { list, pagination } = manageDetail;
+  return (
+    <Fragment>
+      <Card title="自动报销单管理单据">{generateHeaderContent()}</Card>
+      <Table
+        style={{ marginTop: 16 }}
+        rowKey={record => record.id}
+        columns={generateColumns()}
+        dataSource={list}
+        pagination={pagination}
+        onChange={handleTableChange}
+      />
+    </Fragment>
+  );
+};
+
+ManageDetail.propTypes = {
+  location: PropTypes.object,
+  manageDetail: PropTypes.object,
+  dispatch: PropTypes.func,
+  loading: PropTypes.object,
+};
 
 export default connect(({ manageDetail, loading }) => ({
   manageDetail,

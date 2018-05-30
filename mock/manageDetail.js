@@ -21,7 +21,7 @@ module.exports = {
     let { pageSize = 10, current = 1 } = body;
     res.status(200).json({
       success: true,
-      information: '请求成功',
+      message: '请求成功',
       data: data.slice((current - 1) * pageSize, current * pageSize),
       pagination: {
         current: Number(current),
@@ -34,21 +34,21 @@ module.exports = {
   [`POST /sendMessage`](req, res) {
     res.status(200).json({
       success: true,
-      information: '发送通知成功'
+      message: '发送通知成功'
     });
   },
 
   [`POST /sendMessageWithCondition`](req, res) {
     res.status(200).json({
       success: true,
-      information: '发送通知成功'
+      message: '发送通知成功'
     });
   },
 
   [`POST /deleteReimburse`](req, res) {
     res.status(200).json({
       success: true,
-      information: '删除成功'
+      message: '删除成功'
     });
   }
 };
