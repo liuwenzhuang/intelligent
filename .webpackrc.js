@@ -22,6 +22,13 @@ const config = {
   "html": {
     "template": "./src/index.ejs"
   },
+  "proxy": {
+    "/": {
+      "target": "http://10.11.65.37:8090/",
+      "changeOrigin": true,
+      "pathRewrite": { "^/api" : "" }
+    }
+  }
 }
 
 export default config;

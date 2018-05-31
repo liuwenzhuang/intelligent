@@ -8,8 +8,8 @@ export default modelExtend(pageModel, {
   namespace: 'manageDetail',
 
   subscriptions: {
-    setup ({ dispatch, history }) {
-      history.listen((location) => {
+    setup({ dispatch, history }) {
+      history.listen(location => {
         const { version, flag } = queryString.parse(location.search);
         if (location.pathname === '/manageDetail') {
           dispatch({
@@ -21,9 +21,9 @@ export default modelExtend(pageModel, {
               pageSize: 20,
               url: Api.MANAGE.QUERY_REIMBURSE_WITH_STATUS,
             },
-          })
+          });
         }
-      })
+      });
     },
   },
 
@@ -36,6 +36,30 @@ export default modelExtend(pageModel, {
           payload: {
             list: data,
             pagination,
+          },
+        });
+      }
+    },
+
+    *sendMessage({ payload }, { put, call }) {
+      const { success, message } = yield call(commonPost, payload);
+      if (success) {
+        yield put({
+          type: 'showSuccessModal',
+          payload: {
+            content: message,
+          },
+        });
+      }
+    },
+
+    *deleteOrRecovery({ payload }, { put, call }) {
+      const { success, message } = yield call(commonPost, payload);
+      if (success) {
+        yield put({
+          type: 'showSuccessModal',
+          payload: {
+            content: message,
           },
         });
       }

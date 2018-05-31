@@ -2,8 +2,7 @@ const serverSuffix = 'data-stats-system';
 const serverUrl =
   process.env.NODE_ENV === 'production'
     ? `${window.location.protocol}//${process.env.SERVER_ENV}`
-    : 'http://10.11.65.37:8090';
-    // : '';
+    : '';
 const appName = '商旅服务--友报账';
 const appAuthor = 'liuwzhb';
 const authorEmail = 'liuwzhb@yonyou.com';
@@ -23,6 +22,7 @@ const Api = {
     RECOVERY_REIMBURSE: `/recoveryReimburse`,
     SEND_MESSAGE: `/sendMessage`,
     SEND_MESSAGE_WITH_CONDITION: `/sendMessageWithCondition`,
+    EXPORT_FAILURE_EXCEL: `exportFailureExcel`,
   },
   ALIYUN: {
     DOWNLOAD_FILE_FROM_ALIYUN: `/downloadFileFromALiyun`,
