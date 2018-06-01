@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'dva';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import { Table, Divider, Row, Col, Card, message } from 'antd';
+import { Table, Divider, Row, Col, Card, message, Popconfirm } from 'antd';
 import { Api, serverUrl } from '../../../config';
 import CONSTANTS from '../Constants';
 import AsyncTrigger from '../../../components/AsyncTrigger';
@@ -90,12 +90,14 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
             <AsyncTrigger
               loading={loading.effects['manageDetail/deleteOrRecovery'] && triggerId === id}
             >
-              <a
-                href="javascript:void(0)"
-                onClick={() => handleDeleteOrRecovery(record, Api.MANAGE.DELETE_REIMBURSE)}
+              <Popconfirm
+                title="确定删除该单据?"
+                okText="确认删除"
+                cancelText="取消"
+                onConfirm={() => handleDeleteOrRecovery(record, Api.MANAGE.DELETE_REIMBURSE)}
               >
-                删除
-              </a>
+                <a href="javascript:void(0)">删除</a>
+              </Popconfirm>
             </AsyncTrigger>
           );
           const resumeDeleteAction = (
