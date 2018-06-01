@@ -7,6 +7,12 @@ import { Api } from '../config';
 export default modelExtend(pageModel, {
   namespace: 'manageDetail',
 
+  state: {
+    modalVisible: false,
+    sendType: 'single',
+    phone: '',
+  },
+
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(location => {
@@ -45,7 +51,10 @@ export default modelExtend(pageModel, {
       const { success, message } = yield call(commonPost, payload);
       if (success) {
         yield put({
-          type: 'showSuccessModal',
+          type: 'hideModal'
+        });
+        yield put({
+          type: 'showSuccessMessage',
           payload: {
             content: message,
           },
@@ -63,6 +72,23 @@ export default modelExtend(pageModel, {
           },
         });
       }
+    },
+  },
+
+  reducers: {
+    showModal(state, { payload }) {
+      return {
+        ...state,
+        ...payload,
+        modalVisible: true,
+      };
+    },
+
+    hideModal(state) {
+      return {
+        ...state,
+        modalVisible: false,
+      };
     },
   },
 });

@@ -1,5 +1,5 @@
 import modelExtend from 'dva-model-extend';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import { commonPost, commonGet } from '../services/api';
 
 const model = {
@@ -48,12 +48,16 @@ const pageModel = modelExtend(model, {
 
     *showSuccessModal({ payload }) {
       const { title = '提示', content = '操作成功' } = payload;
-      Modal.info({
+      yield Modal.info({
         title,
         content,
       });
-      yield true;
     },
+
+    *showSuccessMessage({ payload }) {
+      const { content } = payload;
+      yield message.success(content);
+    }
   },
 
   reducers: {

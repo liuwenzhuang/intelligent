@@ -2,10 +2,11 @@ import React, { Fragment } from 'react';
 import { connect } from 'dva';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import { Table, Divider, Row, Col, Card } from 'antd';
+import { Table, Divider, Row, Col, Card, message } from 'antd';
 import { Api, serverUrl } from '../../../config';
 import CONSTANTS from '../Constants';
 import AsyncTrigger from '../../../components/AsyncTrigger';
+import SendMessageModal from './SendMessageModal';
 
 let triggerId = '';
 
@@ -36,22 +37,6 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
         version,
       },
     }).then(queryList);
-  };
-
-  const handleSendMessage = ({ phone, id = 'SEND_ALL_MESSAGE' } = {}) => {
-    triggerId = id;
-    dispatch({
-      type: 'manageDetail/sendMessage',
-      payload: {
-        version,
-        phone,
-        url: phone ? Api.MANAGE.SEND_MESSAGE_WITH_CONDITION : Api.MANAGE.SEND_MESSAGE,
-      },
-    });
-  };
-
-  const handleTableChange = pagination => {
-    queryList(pagination);
   };
 
   const generateColumns = () => {
@@ -96,7 +81,7 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
         key: 'operation',
         align: 'center',
         render: (text, record) => {
-          const { status, billDetailUrl, id } = record;
+          const { status, billDetailUrl, id, phone } = record;
           let childs = [];
           /* eslint-disable */
           const divider = <Divider type="vertical" />;
@@ -126,11 +111,17 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
             </AsyncTrigger>
           );
           const dispatchNotificationAction = (
-            <AsyncTrigger loading={loading.effects['manageDetail/sendMessage'] && triggerId === id}>
-              <a href="javascript:void(0)" onClick={() => handleSendMessage(record)}>
-                发送通知
-              </a>
-            </AsyncTrigger>
+            <a
+              href="javascript:void(0)"
+              onClick={() => {
+                dispatch({
+                  type: 'manageDetail/showModal',
+                  payload: { sendType: CONSTANTS.SENDTYPEMAPPING.single, phone },
+                });
+              }}
+            >
+              发送通知
+            </a>
           );
           switch (`${status}`) {
             case CONSTANTS.SUBMITTED: // 已提交
@@ -188,15 +179,17 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
                 导入成功：{successCount}
               </Col>
               <Col md={4} xs={24}>
-                <AsyncTrigger
-                  loading={
-                    loading.effects['manageDetail/sendMessage'] && triggerId === 'SEND_ALL_MESSAGE'
+                <a
+                  href="javascript:void(0)"
+                  onClick={() =>
+                    dispatch({
+                      type: 'manageDetail/showModal',
+                      payload: { sendType: CONSTANTS.SENDTYPEMAPPING.multiple },
+                    })
                   }
                 >
-                  <a href="javascript:void(0)" onClick={() => handleSendMessage()}>
-                    全部发送通知
-                  </a>
-                </AsyncTrigger>
+                  全部发送通知
+                </a>
               </Col>
             </Fragment>
           ) : null}
@@ -222,7 +215,65 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
     return headerContent;
   };
 
-  const { list, pagination } = manageDetail;
+  const { list, pagination, modalVisible, sendType, phone } = manageDetail;
+  const modalProps = {
+    title: '发送通知',
+    visible: modalVisible,
+    okText: '确定发送',
+    destroyOnClose: true,
+    confirmLoading: loading.effects['manageDetail/sendMessage'],
+    onOk(values) {
+      if (!values.length) {
+        message.error('请至少选择一种通知方式');
+        return;
+      }
+      const { single, multiple } = CONSTANTS.SENDTYPEMAPPING;
+      switch (sendType) {
+        case single:
+          dispatch({
+            type: 'manageDetail/sendMessage',
+            payload: {
+              url: Api.MANAGE.SEND_MESSAGE_WITH_CONDITION,
+              phone,
+              version,
+              types: values,
+            },
+          });
+          break;
+        case multiple:
+          dispatch({
+            type: 'manageDetail/sendMessage',
+            payload: {
+              url: Api.MANAGE.SEND_MESSAGE,
+              version,
+              types: values,
+            },
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    onCancel() {
+      dispatch({
+        type: 'manageDetail/hideModal',
+      });
+    },
+  };
+  const checkboxOptions = [
+    {
+      label: 'APP消息推送',
+      value: 'app',
+    },
+    {
+      label: '短信',
+      value: 'message',
+    },
+    {
+      label: '邮件',
+      value: 'email',
+    },
+  ];
   return (
     <Fragment>
       <Card title="自动报销单管理单据">{generateHeaderContent()}</Card>
@@ -232,8 +283,9 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
         columns={generateColumns()}
         dataSource={list}
         pagination={pagination}
-        onChange={handleTableChange}
+        onChange={queryList}
       />
+      <SendMessageModal {...modalProps} checkboxOptions={checkboxOptions} />
     </Fragment>
   );
 };

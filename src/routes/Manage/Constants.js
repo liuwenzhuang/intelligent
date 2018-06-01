@@ -12,6 +12,11 @@ const STATUSMAPPING = {
   [SUBMITTED]: '已提交',
 };
 
+const SENDTYPEMAPPING = {
+  'single': 'single',
+  'multiple': 'multiple'
+};
+
 export default {
   SUCCESS,
   FAILURE,
@@ -19,5 +24,6 @@ export default {
   DELETED,
   UNSUBMIT,
   SUBMITTED,
-  STATUSMAPPING
+  STATUSMAPPING,
+  SENDTYPEMAPPING,
 };
