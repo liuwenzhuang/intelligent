@@ -33,6 +33,18 @@
 2. 在`src/models`文件夹内为此页面添加对应model
 3. 在`src/router.js`中的`routes数组`中添加页面和对应的model
 
+## effects中获取state
+
+```
+effects: {
+  *sendMessage({ payload }, { select }) {
+    const phone = yield select(state => state[NAMESPACE]);
+  }
+}
+```
+
+ > 可以通过`redux-saga`中提供的`select`方法获取到state。
+
 ## 使用本地antd图标
 
 默认情况下antd使用的是远程阿里云图标，如果想要使用本地图标，可按照下面的步骤：
