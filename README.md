@@ -35,7 +35,7 @@
 
 ## effects中获取state
 
-```
+```javascript
 effects: {
   *sendMessage({ payload }, { select }) {
     const phone = yield select(state => state[NAMESPACE]);
@@ -44,6 +44,37 @@ effects: {
 ```
 
  > 可以通过`redux-saga`中提供的`select`方法获取到state。
+
+## subscriptions订阅方法
+
+`subscriptions`用于订阅数据源，如websocket连接，键盘输入，路由变化等，在其中可定义多个方法用于订阅不同数据源，其中每个方法的结构如下：
+
+```javascript
+subscriptions: {
+  [EVENTNAME01]({ dispatch, history }) {
+    // bala...
+  },
+  [EVENTNAME02]({ dispatch, history }) {
+    // bala...
+  }
+}
+```
+
+以拦截键盘事件为例：
+
+```javascript
+// model.js
+import key from 'keymaster';
+
+subscriptions: {
+  keyEvent({ dispatch, history }) {
+    key('ctrl + r', () => {
+      alert('you gonna reload this page');
+      // bala...
+    });
+  }
+}
+```
 
 ## 使用本地antd图标
 
