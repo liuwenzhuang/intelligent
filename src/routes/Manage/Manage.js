@@ -26,7 +26,6 @@ const Manage = ({ dispatch, loading, manage }) => {
   };
 
   const handleTableChange = ({ current, pageSize }) => {
-    const { dispatch } = this.props;
     dispatch({
       type: 'manage/queryList',
       payload: {
