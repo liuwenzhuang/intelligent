@@ -1,7 +1,7 @@
 const serverSuffix = 'data-stats-system';
 const serverUrl =
   process.env.NODE_ENV === 'production'
-    ? `${window.location.protocol}//${process.env.SERVER_ENV}`
+    ? `${window.location.protocol}//${process.env.SERVER_ENV}/intelligent`
     : '';
 const appName = '商旅服务--友报账';
 const appAuthor = 'liuwzhb';
