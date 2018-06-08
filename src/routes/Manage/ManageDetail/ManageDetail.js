@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'dva';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
-import { Table, Divider, Row, Col, Card, message, Popconfirm } from 'antd';
+import { Table, Divider, Row, Col, Card, message, Popconfirm, Modal } from 'antd';
 import { Api, serverUrl } from '../../../config';
 import CONSTANTS from '../Constants';
 import AsyncTrigger from '../../../components/AsyncTrigger';
@@ -37,6 +37,14 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
         version,
       },
     }).then(queryList);
+  };
+
+  /**
+   * 单据状态为失败时，不跳转到详情页面，弹窗提示错误原因
+   * @param {*} param0
+   */
+  const handleViewErrorMessage = ({ exception = '错误原因不详' }) => {
+    Modal.error({ title: '错误原因', content: exception });
   };
 
   const generateColumns = () => {
@@ -86,6 +94,9 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
           /* eslint-disable */
           const divider = <Divider type="vertical" />;
           const viewDetailsAction = <a href={billDetailUrl}>查看详情</a>;
+          const viewErrorMessageAction = (
+            <a href="javascript:" onClick={() => handleViewErrorMessage(record)}>查看详情</a>
+          );
           const deleteAction = (
             <AsyncTrigger
               loading={loading.effects['manageDetail/deleteOrRecovery'] && triggerId === id}
@@ -126,11 +137,7 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
             </a>
           );
           switch (`${status}`) {
-            case CONSTANTS.SUBMITTED: // 已提交
-            case CONSTANTS.IMPORT_FAILURE: // 导入失败
-              childs = [viewDetailsAction];
-              break;
-            case CONSTANTS.UNSUBMIT:
+            case CONSTANTS.UNSUBMIT:  // 未提交
               childs = [
                 deleteAction,
                 divider,
@@ -139,8 +146,11 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
                 dispatchNotificationAction,
               ];
               break;
-            case CONSTANTS.DELETED:
+            case CONSTANTS.DELETED: // 已删除
               childs = [resumeDeleteAction, divider, viewDetailsAction];
+              break;
+            case CONSTANTS.IMPORT_FAILURE: // 导入失败
+              childs = [viewErrorMessageAction];
               break;
             default:
               childs = [viewDetailsAction];
