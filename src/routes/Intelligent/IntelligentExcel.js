@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Upload, Tabs, Table, Button } from 'antd';
+import { Upload, Tabs, Table, Button, Modal, Spin } from 'antd';
 import { serverUrl } from '../../config';
 import Constant from './Constants';
 import styles from './index.less';
+import { routerRedux } from 'dva/router';
 
 const TabPane = Tabs.TabPane;
 
@@ -12,9 +13,43 @@ class IntelligentExcel extends Component {
     super(props);
     this.state = {
       tabsKey: Constant.SETTYPES.OUTDATA, // 按部门 or 按用户
+      uploading: false,
     };
     this.generateTable = this.generateTable.bind(this);
     this.handleTabsChange = this.handleTabsChange.bind(this);
+    this.handleUpload = this.handleUpload.bind(this);
+  }
+
+  handleUpload({ file }) {
+    const { status } = file;
+    const { dispatch } = this.props;
+    switch (status) {
+      case 'uploading':
+        this.setState({ uploading: true });
+        return;
+      case 'done':
+        this.setState({ uploading: false });
+        const { successCount = 0, failureCount = 0 } = file.response;
+        Modal.confirm({
+          title: '导入完成!',
+          content: `导入成功${successCount}条数据，导入失败${failureCount}条。`,
+          okText: '查看详情',
+          cancelText: '取消',
+          iconType: 'check-circle',
+          className: styles.confirmModal,
+          onOk() {
+            dispatch(
+              routerRedux.push({
+                pathname: '/manage',
+              })
+            );
+          },
+        });
+        return;
+      default:
+        this.setState({ uploading: false });
+        break;
+    }
   }
 
   /**
@@ -59,6 +94,8 @@ class IntelligentExcel extends Component {
                 <Upload
                   accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                   action={`${serverUrl}/singleFileUpload`}
+                  showUploadList={false}
+                  onChange={this.handleUpload}
                 >
                   <Button type="primary">导入数据文件</Button>
                 </Upload>
@@ -106,6 +143,7 @@ class IntelligentExcel extends Component {
 
   render() {
     const tableContent = this.generateTable();
+    const { uploading } = this.state;
     return (
       <div className={styles.ctrip}>
         <Tabs onChange={this.handleTabsChange}>
@@ -119,6 +157,18 @@ class IntelligentExcel extends Component {
             <div className={styles.panel}>{tableContent}</div>
           </TabPane>
         </Tabs>
+        <Modal
+          visible={uploading}
+          maskClosable={false}
+          keyboard={false}
+          footer={null}
+          closable={false}
+        >
+          <div className={styles.uploading}>
+            <Spin />
+            导入中...
+          </div>
+        </Modal>
       </div>
     );
   }

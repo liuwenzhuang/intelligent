@@ -19,3 +19,20 @@
     border: 1px solid #e6e6e6;
   }
 }
+
+.uploading {
+  text-align: center;
+  :global {
+    .ant-spin-spinning {
+      display: block;
+    }
+  }
+}
+
+.confirmModal {
+  :global {
+    .ant-confirm-body > .anticon {
+      color: @second-color;
+    }
+  }
+}
