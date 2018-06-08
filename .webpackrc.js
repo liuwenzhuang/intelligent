@@ -1,4 +1,4 @@
-const config = {
+let config = {
   theme: "./theme.config.js",
   "hash": true,
   "extraBabelPlugins": [
@@ -30,5 +30,7 @@ const config = {
     }
   }
 }
+
+if(process.env.NODE_PROXY === 'false') delete config.proxy;
 
 export default config;
