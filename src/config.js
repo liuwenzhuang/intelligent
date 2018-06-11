@@ -22,7 +22,7 @@ const Api = {
     RECOVERY_REIMBURSE: `/recoveryReimburse`,
     SEND_MESSAGE: `/sendMessage`,
     SEND_MESSAGE_WITH_CONDITION: `/sendMessageWithCondition`,
-    EXPORT_FAILURE_EXCEL: `exportFailureExcel`,
+    EXPORT_FAILURE_EXCEL: `/exportFailureExcel`,
   },
   ALIYUN: {
     DOWNLOAD_FILE_FROM_ALIYUN: `/downloadFileFromALiyun`,
