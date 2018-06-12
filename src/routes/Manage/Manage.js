@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { routerRedux, Link } from 'dva/router';
+import { routerRedux } from 'dva/router';
 import queryString from 'query-string';
 import { Card, Button } from 'antd';
 import List from './List';
@@ -48,8 +48,11 @@ const Manage = ({ dispatch, loading, manage }) => {
     <Card
       title="自动报销单管理"
       extra={
-        <Button type="primary">
-          <Link to={'/intelligentexcel'}>自动报销单制单</Link>
+        <Button
+          type="primary"
+          onClick={() => dispatch(routerRedux.push({ pathname: '/intelligentexcel' }))}
+        >
+          自动报销单制单
         </Button>
       }
       className={styles.manage}
