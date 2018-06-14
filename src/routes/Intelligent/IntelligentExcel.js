@@ -46,6 +46,13 @@ class IntelligentExcel extends Component {
           },
         });
         return;
+      case 'error':
+        this.setState({ uploading: false });
+        Modal.error({
+          title: '失败',
+          content: '导入失败'
+        });
+        break;
       default:
         this.setState({ uploading: false });
         break;
