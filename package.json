@@ -3,9 +3,9 @@
   "scripts": {
     "start": "roadhog server",
     "start-no-proxy": "cross-env NODE_PROXY=false roadhog server",
-    "build": "cross-env NODE_ENV=production SERVER_ENV=ybz.yonyoucloud.com roadhog build",
-    "publish_234": "cross-env NODE_ENV=production SERVER_ENV=ybz.yonyoucloud.com roadhog build && scp -r ./dist/* root@10.3.14.230:/server/featureresources/ybz_intelligent && ssh root@10.3.14.230 scp -rp  /server/featureresources/ybz_intelligent root@10.3.14.244:/server/featureresources/ && ssh root@10.3.14.230 docker cp /server/featureresources/ybz_intelligent ybz_nginx:/server/featureresources/ && ssh root@10.3.14.244 docker cp /server/featureresources/ybz_intelligent ybz_nginx:/server/featureresources/",
-    "publish_244": "cross-env NODE_ENV=production SERVER_ENV=ybz.yonyoucloud.com roadhog build && scp -r ./dist/* root@10.3.14.230:/server/testresources/ybz_intelligent && ssh root@10.3.14.230 scp -rp  /server/testresources/ybz_intelligent root@10.3.14.244:/server/testresources/ && ssh root@10.3.14.230 docker cp /server/testresources/ybz_intelligent ybz_nginx:/server/testresources/ && ssh root@10.3.14.244 docker cp /server/testresources/ybz_intelligent ybz_nginx:/server/testresources/",
+    "build": "cross-env NODE_ENV=production SERVER_ENV=intelligent.app.yyuap.com roadhog build",
+    "publish_234": "cross-env NODE_ENV=production SERVER_ENV=intelligent.app.yyuap.com roadhog build && scp -r ./dist/* root@10.3.14.230:/server/featureresources/ybz_intelligent && ssh root@10.3.14.230 scp -rp  /server/featureresources/ybz_intelligent root@10.3.14.244:/server/featureresources/ && ssh root@10.3.14.230 docker cp /server/featureresources/ybz_intelligent ybz_nginx:/server/featureresources/ && ssh root@10.3.14.244 docker cp /server/featureresources/ybz_intelligent ybz_nginx:/server/featureresources/",
+    "publish_244": "cross-env NODE_ENV=production SERVER_ENV=intelligent.app.yyuap.com roadhog build && scp -r ./dist/* root@10.3.14.230:/server/testresources/ybz_intelligent && ssh root@10.3.14.230 scp -rp  /server/testresources/ybz_intelligent root@10.3.14.244:/server/testresources/ && ssh root@10.3.14.230 docker cp /server/testresources/ybz_intelligent ybz_nginx:/server/testresources/ && ssh root@10.3.14.244 docker cp /server/testresources/ybz_intelligent ybz_nginx:/server/testresources/",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint",
     "prettier": "prettier --write ./src/**/**/**/*",
