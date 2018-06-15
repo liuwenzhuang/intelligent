@@ -34,15 +34,18 @@ function checkStatus(response) {
 }
 
 function checkCode(response) {
-  if (response.success) {
+  const { code, detailMsg, data } = response;
+  if (+code === 20000) {
     return {
-      ...response,
+      success: true,
+      message: detailMsg,
+      ...data,
     };
   }
-  const errortext = typeof response['message'] === 'string' ? response['message'] : '请求失败';
+  const errortext = detailMsg || '未知错误';
   notification.error({
     message: `请求失败`,
-    description: errortext,
+    description: `${code}: ${errortext}`,
   });
   const error = new Error(errortext);
   throw error;

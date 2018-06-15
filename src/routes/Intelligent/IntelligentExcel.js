@@ -29,10 +29,12 @@ class IntelligentExcel extends Component {
         return;
       case 'done':
         this.setState({ uploading: false });
-        const { successCount = 0, failureCount = 0 } = file.response;
+        const {
+          data: { information },
+        } = file.response;
         Modal.confirm({
-          title: '导入完成!',
-          content: `导入成功${successCount}条数据，导入失败${failureCount}条。`,
+          title: '提示',
+          content: information,
           okText: '查看详情',
           cancelText: '取消',
           iconType: 'check-circle',
@@ -48,9 +50,10 @@ class IntelligentExcel extends Component {
         return;
       case 'error':
         this.setState({ uploading: false });
+        const { code, detailMsg } = file.response;
         Modal.error({
           title: '失败',
-          content: '导入失败'
+          content: `${code}: ${detailMsg}`,
         });
         break;
       default:
