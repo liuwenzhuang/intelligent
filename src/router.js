@@ -19,21 +19,6 @@ const Routers = function({ history, app }) {
   });
   const routes = [
     {
-      path: '/ctripsecondauthorized',
-      models: () => [import('./models/ctripSecondAuthorized')],
-      component: () => import('./routes/CtripSecondAuthorized'),
-    },
-    {
-      path: '/ctripgroup',
-      models: () => [import('./models/ctripGroup')],
-      component: () => import('./routes/CtripGroup'),
-    },
-    {
-      path: '/openservices',
-      models: () => [import('./models/openServices')],
-      component: () => import('./routes/OpenServices'),
-    },
-    {
       path: '/intelligentexcel',
       models: () => [import('./models/intelligentExcel')],
       component: () => import('./routes/Intelligent'),
