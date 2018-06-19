@@ -1,6 +1,8 @@
 const Mock = require('mockjs');
 const { Random } = Mock;
 
+const { SUCCESS_SHELL } = require('./common');
+
 let data = [];
 
 for (let i = 0; i < 200; i++) {
@@ -15,18 +17,20 @@ for (let i = 0; i < 200; i++) {
 }
 
 module.exports = {
-
   [`POST /reimburse/queryReimburseList`](req, res, u) {
     const { body } = req;
     let { pageSize = 10, current = 1 } = body;
     res.status(200).json({
-      success: true,
-      information: '请求成功',
-      data: data.slice((current - 1) * pageSize, current * pageSize),
-      pagination: {
-        current: Number(current),
-        pageSize: Number(pageSize),
-        total: data.length,
+      ...SUCCESS_SHELL,
+      data: {
+        success: true,
+        information: '请求成功',
+        data: data.slice((current - 1) * pageSize, current * pageSize),
+        pagination: {
+          current: Number(current),
+          pageSize: Number(pageSize),
+          total: data.length,
+        },
       },
     });
   },
