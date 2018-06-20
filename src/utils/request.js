@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
+import { getCookie } from './utils';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -61,6 +62,9 @@ function checkCode(response) {
 export default function request(url, options) {
   const defaultOptions = {
     credentials: 'include',
+    headers: {
+      tenantid: getCookie('tenantid'),
+    },
   };
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
