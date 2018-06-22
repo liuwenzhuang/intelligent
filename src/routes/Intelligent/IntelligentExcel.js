@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Upload, Tabs, Table, Button, Modal, Spin } from 'antd';
 import { serverUrl } from '../../config';
+import { getCookie } from '../../utils/utils';
 import Constant from './Constants';
 import styles from './index.less';
 import { routerRedux } from 'dva/router';
@@ -100,12 +101,14 @@ class IntelligentExcel extends Component {
             dataIndex: 'set',
             key: 'set',
             render: (text, record) => {
+              const tenantid = getCookie('tenantid');
               return (
                 <Upload
                   accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                  action={`${serverUrl}/singleFileUpload`}
+                  action={`${serverUrl}/singleFileUpload?tenantid=${tenantid}`}
                   showUploadList={false}
                   onChange={this.handleUpload}
+                  headers={{tenantid: getCookie('tenantid')}}
                 >
                   <Button type="primary">导入数据文件</Button>
                 </Upload>
