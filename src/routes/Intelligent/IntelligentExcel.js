@@ -85,10 +85,11 @@ class IntelligentExcel extends Component {
             dataIndex: 'operation',
             key: 'operation',
             render: (text, record) => {
+              const tenantid = getCookie('tenantid');
               return (
                 <Button
                   type="primary"
-                  href={`${serverUrl}/exportExcel?id=${record.id}`}
+                  href={`${serverUrl}/exportExcel?id=${record.id}&tenantid=${tenantid}`}
                   target="_blank"
                 >
                   导出数据格式文件

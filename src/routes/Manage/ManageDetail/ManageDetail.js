@@ -177,6 +177,7 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
         fileName,
         version,
       } = query;
+      const tenantid = getCookie('tenantid');
       headerContent = (
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} align="middle" type="flex">
           <Col md={4} xs={24}>
@@ -213,7 +214,7 @@ const ManageDetail = ({ location, manageDetail, loading, dispatch }) => {
               <Col md={4} xs={24}>
                 <a
                   target="_blank"
-                  href={`${serverUrl}${Api.MANAGE.EXPORT_FAILURE_EXCEL}?version=${version}`}
+                  href={`${serverUrl}${Api.MANAGE.EXPORT_FAILURE_EXCEL}?version=${version}&tenantid=${tenantid}`}
                 >
                   下载导入失败数据
                 </a>
