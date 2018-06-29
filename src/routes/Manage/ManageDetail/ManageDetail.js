@@ -7,6 +7,7 @@ import { Api, serverUrl } from '../../../config';
 import CONSTANTS from '../Constants';
 import AsyncTrigger from '../../../components/AsyncTrigger';
 import SendMessageModal from './SendMessageModal';
+import { getCookie } from '../../../utils/utils';
 
 let triggerId = '';
 
